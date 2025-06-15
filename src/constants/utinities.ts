@@ -20,7 +20,7 @@ export const APP_UTINITIES: Array<Utinity> = [
         key: "info",
         label: "Thông tin",
         icon: Icon.BookIcon,
-        path: "/information-guide",
+        path: "/info",
     },
     // {
     //     key: "feedback",
