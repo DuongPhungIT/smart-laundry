@@ -10,6 +10,7 @@ import {
 import { GuidelinesPage } from "./Guidelines";
 import { HomePage } from "./Home";
 import { InformationGuidePage } from "./InformationGuide";
+import { CreateOrderPage } from "./CreateOrder";
 import { InformationOrderPage } from "./InformationOrder";
 import { CreateScheduleAppointmentPage } from "./CreateScheduleAppointment";
 import { AppointmentScheduleResultPage } from "./AppointmentScheduleResult";
@@ -40,6 +41,10 @@ const Routes: React.FC = () => (
             <Route
                 path="/information-order"
                 element={<InformationOrderPage />}
+            />
+            <Route
+                path="/create-order"
+                element={<CreateOrderPage />}
             />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/profile" element={<ProfilePage />} />

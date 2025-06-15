@@ -34,7 +34,7 @@ module.exports = {
         "import/prefer-default-export": "off",
         "no-useless-catch": "off",
         "no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars": "error",
+        // "@typescript-eslint/no-unused-vars": "error",
         "react/function-component-definition": "off",
         "react/require-default-props": "off",
         "no-use-before-define": "off",

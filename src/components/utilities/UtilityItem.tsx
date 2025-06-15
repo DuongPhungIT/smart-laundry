@@ -29,15 +29,14 @@ export interface UtinityItemProps {
 
 const Wrapper = styled.div`
     ${tw`flex flex-col items-center p-1 mb-2`};
-    width: calc(calc(50%) - 12px);
-    &:not(:nth-child(2n)) {
-        margin-right: 12px;
-    }
+    width: 50%;
 `;
 const IconWrapper = styled.div`
     ${tw`rounded-2xl bg-icon_bg relative`};
     width: 100%;
     display: inline-flex;
+    flex-direction: column;
+    color: #173553;
     justify-content: center;
     align-items: center;
     height: 95px;
@@ -50,6 +49,8 @@ const CenterIcon = styled.div`
 const Label = styled(Text)`
     ${tw`text-center`};
     margin-top: 8px;
+    font-size: 16px;
+    font-weight: 500;
 `;
 
 const UtinityItem: FunctionComponent<UtinityItemProps> = props => {
@@ -69,9 +70,9 @@ const UtinityItem: FunctionComponent<UtinityItemProps> = props => {
                     <CenterIcon>
                         <Icon />
                     </CenterIcon>
+                    <Label size="xxSmall">{label}</Label>
                 </IconWrapper>
             )}
-            <Label size="xxSmall">{label}</Label>
         </Wrapper>
     );
 };

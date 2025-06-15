@@ -11,23 +11,23 @@ import Renew from "@assets/files.png";
 
 export const APP_UTINITIES: Array<Utinity> = [
     {
-        key: "create-schedule-appointment",
-        label: "Đặt lịch giặt sấy",
+        key: "create-order",
+        label: "Đặt hàng",
         icon: Icon.CalendarIcon,
-        path: "/create-schedule-appointment",
+        path: "/create-order",
     },
     {
         key: "info",
-        label: "Thông tin - hướng dẫn",
+        label: "Thông tin",
         icon: Icon.BookIcon,
         path: "/information-guide",
     },
-    {
-        key: "feedback",
-        label: "Góp ý - phản ánh",
-        icon: Icon.PenIcon,
-        path: "/feedbacks",
-    },
+    // {
+    //     key: "feedback",
+    //     label: "Góp ý - phản ánh",
+    //     icon: Icon.PenIcon,
+    //     path: "/feedbacks",
+    // },
     // {
     //     key: "goverment",
     //     label: "Cổng dịch vụ công quốc gia",
@@ -40,12 +40,12 @@ export const APP_UTINITIES: Array<Utinity> = [
     //     icon: Icon.SearchIcon,
     //     path: "/search",
     // },
-    {
-        key: "order",
-        label: "Thông tin hoá đơn",
-        icon: Icon.SearchIcon,
-        path: "/information-order",
-    },
+    // {
+    //     key: "order",
+    //     label: "Thông tin hoá đơn",
+    //     icon: Icon.SearchIcon,
+    //     path: "/information-order",
+    // },
 ];
 
 export const CONTACTS: Array<Utinity> = [
