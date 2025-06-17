@@ -3,7 +3,7 @@ import { Box, Icon, Text } from "zmp-ui";
 import "styled-components/macro";
 import { Button, Input } from "@components";
 import { useForm, Controller } from "react-hook-form";
-import { getPhoneNumber, getUserInfo } from "zmp-sdk/apis";
+import { getPhoneNumber, getUserInfo, getAccessToken } from "zmp-sdk/apis";
 
 type Quantities = Record<string, number>;
 
@@ -54,35 +54,57 @@ const CreateOrderForm: React.FC = () => {
     });
 
     useEffect(() => {
-        const fetchPhoneNumber = async () => {
-            try {
-                const resp = await getPhoneNumber({});
-                console.log("response", resp);
-                // Kiểm tra nếu response hợp lệ và có trường number
-                if (resp && resp.number) {
-                    setPhoneNumber(resp.number);
-                    // Do something with the phone number if needed
-                    console.log("Phone Number:", resp.number, resp);
-                }
-            } catch (error) {
-                console.error("Error fetching phone number:", error);
-            }
-        };
-        fetchPhoneNumber();
         const fetchUserInfo = async () => {
             try {
                 const user = await getUserInfo({ avatarType: "normal" });
                 const { userInfo } = user;
                 setUserInfomation(userInfo);
                 console.log("User Info:", userInfo);
-                console.log("User ===:", user);
-                // Do something with the user info if needed
             } catch (error) {
                 console.error("Error fetching user info:", error);
             }
         };
         fetchUserInfo();
     }, []);
+
+    const handleGetPhoneNumber = async () => {
+        try {
+            const resp = await getPhoneNumber({});
+            const userAccessToken =
+                (await getAccessToken({})) || "ACCESS_TOKEN";
+            const secretKey = "CrY9lR93KIO34OGDIgxu";
+
+            if (resp?.token) {
+                // Gọi trực tiếp Zalo API để lấy số điện thoại
+                const zaloResp = await fetch(
+                    "https://graph.zalo.me/v2.0/me/info",
+                    {
+                        method: "GET",
+                        headers: {
+                            access_token: userAccessToken,
+                            code: resp.token,
+                            secret_key: secretKey,
+                        },
+                    },
+                );
+
+                const result = await zaloResp.json();
+
+                if (result?.data?.number) {
+                    console.log("Phone Number Token result:", result);
+                    console.log("Phone Number Token data:", result?.data);
+                    setPhoneNumber(result.data.number);
+                } else {
+                    console.error(
+                        "Không lấy được số điện thoại từ Zalo API",
+                        result,
+                    );
+                }
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy số điện thoại:", error);
+        }
+    };
 
     const quantities = watch("quantities");
 
@@ -92,7 +114,6 @@ const CreateOrderForm: React.FC = () => {
         const selectedProducts: SelectedProduct[] = Object.entries(
             data.quantities || {},
         )
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .filter(([_, quantity]) => quantity > 0)
             .map(([key, quantity]) => {
                 const product = BANH_BAO_OPTIONS.find(
@@ -106,7 +127,8 @@ const CreateOrderForm: React.FC = () => {
             });
 
         const order: Order = {
-            fullName: userInfomation?.name || userInfomation?.id || "Không có tên",
+            fullName:
+                userInfomation?.name || userInfomation?.id || "Không có tên",
             phoneNumber: phoneNumber || "Không có số điện thoại",
             products: selectedProducts,
         };
@@ -128,14 +150,29 @@ const CreateOrderForm: React.FC = () => {
             <Box p={4} tw="bg-white">
                 <Box>
                     <Text style={{ fontWeight: 500 }}>
-                        Họ và tên: {userInfomation?.name || userInfomation?.id || "Không có tên"} 
+                        Họ và tên:{" "}
+                        {userInfomation?.name ||
+                            userInfomation?.id ||
+                            "Không có tên"}
                     </Text>
                 </Box>
+
                 <Box mt={2}>
                     <Text style={{ fontWeight: 500 }}>
                         Số điện thoại: {phoneNumber || "Không có số điện thoại"}
                     </Text>
                 </Box>
+                {!phoneNumber && (
+                    <Box mt={2} textAlign="center">
+                        <Button
+                            onClick={() => {
+                                handleGetPhoneNumber();
+                            }}
+                        >
+                            Cho phép truy cập số điện thoại
+                        </Button>
+                    </Box>
+                )}
 
                 <Box mt={4}>
                     <Text style={{ marginBottom: 10, fontWeight: "bold" }}>
@@ -224,7 +261,7 @@ const CreateOrderForm: React.FC = () => {
                     <Text>Số điện thoại: {infoOrder.phoneNumber}</Text>
                     <Text style={{ marginTop: 10 }}>Sản phẩm đã chọn:</Text>
                     {infoOrder.products.map((product, index) => (
-                        <Text key={Number(index)}>
+                        <Text key={index}>
                             {product.product} - Số lượng: {product.quantity}
                         </Text>
                     ))}
