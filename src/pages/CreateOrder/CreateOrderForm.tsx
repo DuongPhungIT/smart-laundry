@@ -57,6 +57,7 @@ const CreateOrderForm: React.FC = () => {
         const fetchUserInfo = async () => {
             try {
                 const user = await getUserInfo({ avatarType: "normal" });
+                await handleGetPhoneNumber()
                 const { userInfo } = user;
                 setUserInfomation(userInfo);
                 console.log("User Info:", userInfo);
@@ -72,7 +73,7 @@ const CreateOrderForm: React.FC = () => {
             const resp = await getPhoneNumber({});
             const userAccessToken =
                 (await getAccessToken({})) || "ACCESS_TOKEN";
-            const secretKey = "CrY9lR93KIO34OGDIgxu";
+            const secretKey = "5NDKWi8Fo48B23hDAl1L";
 
             if (resp?.token) {
                 // Gọi trực tiếp Zalo API để lấy số điện thoại
@@ -162,7 +163,7 @@ const CreateOrderForm: React.FC = () => {
                         Số điện thoại: {phoneNumber || "Không có số điện thoại"}
                     </Text>
                 </Box>
-                {!phoneNumber && (
+                {/* {!phoneNumber && (
                     <Box mt={2} textAlign="center">
                         <Button
                             onClick={() => {
@@ -172,7 +173,7 @@ const CreateOrderForm: React.FC = () => {
                             Cho phép truy cập số điện thoại
                         </Button>
                     </Box>
-                )}
+                )} */}
 
                 <Box mt={4}>
                     <Text style={{ marginBottom: 10, fontWeight: "bold" }}>
@@ -204,6 +205,8 @@ const CreateOrderForm: React.FC = () => {
                                         render={({ field }) => (
                                             <Input
                                                 type="number"
+                                                inputMode="numeric"
+                                                pattern="[0-9]*"
                                                 min={0}
                                                 value={field.value}
                                                 onChange={e =>

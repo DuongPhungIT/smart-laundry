@@ -3,7 +3,7 @@ import { Box, Text } from "zmp-ui";
 import "styled-components/macro";
 import { Button, Input } from "@components";
 import { useForm } from "react-hook-form";
-import { getPhoneNumber, getUserInfo } from "zmp-sdk/apis";
+import { getPhoneNumber, getUserInfo, getAccessToken } from "zmp-sdk/apis";
 
 const InfoUserForm: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -22,22 +22,54 @@ const InfoUserForm: React.FC = () => {
         },
     });
 
-    useEffect(() => {
-        const fetchPhoneNumber = async () => {
-            try {
-                const resp = await getPhoneNumber({});
-                if (resp && resp.number) {
-                    setPhoneNumber(resp.number);
+    const handleGetPhoneNumber = async () => {
+        try {
+            const resp = await getPhoneNumber({});
+            const userAccessToken =
+                (await getAccessToken({})) || "ACCESS_TOKEN";
+            const secretKey = "5NDKWi8Fo48B23hDAl1L";
+
+            if (resp?.token) {
+                // Gọi trực tiếp Zalo API để lấy số điện thoại
+                const zaloResp = await fetch(
+                    "https://graph.zalo.me/v2.0/me/info",
+                    {
+                        method: "GET",
+                        headers: {
+                            access_token: userAccessToken,
+                            code: resp.token,
+                            secret_key: secretKey,
+                        },
+                    },
+                );
+
+                const result = await zaloResp.json();
+
+                if (result?.data?.number) {
+                    console.log("Phone Number Token result:", result);
+                    console.log("Phone Number Token data:", result?.data);
+                    setPhoneNumber(result.data.number);
+                } else {
+                    console.error(
+                        "Không lấy được số điện thoại từ Zalo API",
+                        result,
+                    );
                 }
-            } catch (error) {
-                console.error("Error fetching phone number:", error);
             }
-        };
-        fetchPhoneNumber();
+        } catch (error) {
+            console.error("Lỗi khi lấy số điện thoại:", error);
+        }
+    };
+
+    useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                const user = await getUserInfo({ avatarType: "normal" });
+                const user = await getUserInfo({
+                    avatarType: "normal",
+                    autoRequestPermission: true,
+                });
                 const { userInfo } = user;
+                await handleGetPhoneNumber();
                 setUserInfomation(userInfo);
             } catch (error) {
                 console.error("Error fetching user info:", error);
