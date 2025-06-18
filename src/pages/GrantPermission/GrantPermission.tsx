@@ -4,7 +4,12 @@ import Logo from "@assets/logo.png";
 
 import { HomeHeader, Utinities } from "@components";
 import { Spinner, Button, Box, Text, Icon } from "zmp-ui";
-import { getPhoneNumber, getUserInfo, getAccessToken } from "zmp-sdk/apis";
+import {
+    getPhoneNumber,
+    getUserInfo,
+    getAccessToken,
+    closeApp,
+} from "zmp-sdk/apis";
 import { APP_UTINITIES } from "@constants/utinities";
 import { useStore } from "@store";
 import { followOA } from "zmp-sdk";
@@ -15,56 +20,90 @@ const GrantPermissionPage: React.FunctionComponent = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const { numberPhone, setNumberPhone, setUser } = useStore();
 
-    useEffect(() => {
-        setLoading(true);
-        const fetchUserInfo = async () => {
-            try {
-                const user = await getUserInfo({
-                    avatarType: "normal",
-                    autoRequestPermission: true,
-                });
-                const { userInfo } = user;
-                setUser(userInfo);
-                setUserInfomation(userInfo);
-            } catch (error) {
-                console.error("Error fetching user info:", error);
-            } finally {
-                setLoading(false);
+    const fetchUserInfo = async () => {
+        try {
+            setLoading(true);
+            const user = await getUserInfo({
+                avatarType: "normal",
+                autoRequestPermission: true,
+            });
+            console.log("user===========", user);
+            const { userInfo } = user;
+            setUser(userInfo);
+            setUserInfomation(userInfo);
+        } catch (error) {
+            console.error("Error fetching user info:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getNumberPhoneByZalo = async token => {
+        const userAccessToken = (await getAccessToken({})) || "ACCESS_TOKEN";
+        const secretKey = "5NDKWi8Fo48B23hDAl1L";
+
+        if (token) {
+            // Gọi trực tiếp Zalo API để lấy số điện thoại
+            const zaloResp = await fetch("https://graph.zalo.me/v2.0/me/info", {
+                method: "GET",
+                headers: {
+                    access_token: userAccessToken,
+                    code: token,
+                    secret_key: secretKey,
+                },
+            });
+            const result = await zaloResp.json();
+
+            console.log("result===========", result);
+            if (result?.data?.number) {
+                setPhoneNumber(result.data.number);
+                setNumberPhone(result.data.number || "");
+                localStorage.setItem("number-phone", result.data.number || "");
             }
-        };
+        }
+    };
+
+    const checkPhonePermission = async () => {
+        try {
+            const resp = await getPhoneNumber({});
+            if (resp?.number) {
+                setPhoneNumber(resp.number);
+                setNumberPhone(resp.number);
+                localStorage.setItem("number-phone", resp.number);
+                return;
+            }
+            if (resp?.token) {
+                getNumberPhoneByZalo(resp.token);
+            } else {
+                localStorage.removeItem("number-phone");
+                setPhoneNumber("");
+                setNumberPhone("");
+            }
+        } catch (err) {
+            // Lỗi → có thể bị thu hồi quyền
+            localStorage.removeItem("number-phone");
+            setPhoneNumber("");
+            setNumberPhone("");
+        }
+    };
+
+    useEffect(() => {
         fetchUserInfo();
+        checkPhonePermission();
     }, []);
 
     const handleGetPhoneNumber = async () => {
         setLoading(true);
         try {
             const resp = await getPhoneNumber({});
-            const userAccessToken =
-                (await getAccessToken({})) || "ACCESS_TOKEN";
-            const secretKey = "5NDKWi8Fo48B23hDAl1L";
 
-            console.log('resp===========', resp)
+            console.log("resp===========", resp);
 
             if (resp?.token) {
-                // Gọi trực tiếp Zalo API để lấy số điện thoại
-                const zaloResp = await fetch(
-                    "https://graph.zalo.me/v2.0/me/info",
-                    {
-                        method: "GET",
-                        headers: {
-                            access_token: userAccessToken,
-                            code: resp.token,
-                            secret_key: secretKey,
-                        },
-                    },
-                );
-                const result = await zaloResp.json();
-                if (result?.data?.number) {
-                    setPhoneNumber(result.data.number);
-                    setNumberPhone(result.data.number || "");
-                }
+                getNumberPhoneByZalo(resp.token);
             } else if (resp?.number) {
                 setPhoneNumber(resp.number);
+                setNumberPhone(resp.number);
             } else {
                 console.log(
                     "Bạn cần cấp quyền truy cập số điện thoại cho OA để sử dụng chức năng này.",
@@ -263,6 +302,9 @@ const GrantPermissionPage: React.FunctionComponent = () => {
                         background: "none",
                         color: "#e53935",
                         fontWeight: 600,
+                    }}
+                    onClick={() => {
+                        closeApp();
                     }}
                 >
                     Từ chối và Thoát
