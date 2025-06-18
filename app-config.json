@@ -3,7 +3,7 @@
         "title": "SMART LAUNDRY",
         "headerColor": "",
         "textColor": "white",
-        "statusBarColor": "#046DD6",
+        "statusBarColor": "#ff0000",
         "leftButton": "back",
         "actionBarHidden": true,
         "hideIOSSafeAreaBottom": true,

@@ -11,7 +11,7 @@ const HeaderContainer = styled.div`
     ${tw`flex bg-main items-center fixed top-0 left-0 w-full px-4 h-[calc(48px + var(--zaui-safe-area-inset-top, 0px))]`};
     padding-top: var(--zaui-safe-area-inset-top);
     z-index: 1;
-    background: red;
+    background: #ff0000;
     background-size: cover;
     height: 170px;
     border-radius: 0 0 40% 40%;

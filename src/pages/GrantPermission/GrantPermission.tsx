@@ -166,7 +166,7 @@ const GrantPermissionPage: React.FunctionComponent = () => {
         );
     }
 
-    if (phoneNumber || numberPhone) {
+    if ((phoneNumber || numberPhone)) {
         return (
             <PageLayout
                 id="grant-permission-page"

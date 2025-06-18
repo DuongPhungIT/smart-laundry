@@ -14,8 +14,8 @@ const HeaderContainer = styled(Header)`
     z-index: 1;
     background: linear-gradient(
             0deg,
-            rgba(214, 4, 87, 0.9),
-            rgba(4, 109, 214, 0.9)
+            rgba(4, 109, 214, 0.9),
+            rgba(255, 0, 0, 1)
         ),
         url(${Background});
     background-size: cover;
