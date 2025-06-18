@@ -9,7 +9,6 @@ import {
 } from "./Feedback";
 import { GuidelinesPage } from "./Guidelines";
 import { HomePage } from "./Home";
-import { GrantPermissionPage } from "./GrantPermission";
 import { InformationGuidePage } from "./InformationGuide";
 import { CreateOrderPage } from "./CreateOrder";
 import { InformationOrderPage } from "./InformationOrder";
@@ -22,8 +21,7 @@ import { InfoUserPage } from "./InfoUser";
 const Routes: React.FC = () => (
     <ZMPRouter>
         <AnimationRoutes>
-            <Route path="/" element={<GrantPermissionPage />} />
-            <Route path="/home" element={<HomePage />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/guidelines" element={<GuidelinesPage />} />
 
             <Route path="/feedbacks" element={<FeedbackPage />} />

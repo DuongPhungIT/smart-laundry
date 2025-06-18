@@ -99,12 +99,8 @@ const OrderList = React.forwardRef<HTMLDivElement, OrderListProps>(
             const fetchPhoneNumber = async () => {
                 try {
                     const resp = await getPhoneNumber({});
-                    console.log("response", resp);
-                    // Kiểm tra nếu response hợp lệ và có trường number
                     if (resp && resp.number) {
                         setPhoneNumber(resp.number);
-                        // Do something with the phone number if needed
-                        console.log("Phone Number:", resp.number, resp);
                     }
                 } catch (error) {
                     console.error("Error fetching phone number:", error);
@@ -116,9 +112,6 @@ const OrderList = React.forwardRef<HTMLDivElement, OrderListProps>(
                     const user = await getUserInfo({ avatarType: "normal" });
                     const { userInfo } = user;
                     setUserInfo(userInfo);
-                    console.log("User Info:", userInfo);
-                    console.log("User ===:", user);
-                    // Do something with the user info if needed
                 } catch (error) {
                     console.error("Error fetching user info:", error);
                 }
