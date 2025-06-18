@@ -291,7 +291,9 @@ const GrantPermissionPage: React.FunctionComponent = () => {
                         fontWeight: 600,
                         marginBottom: 12,
                     }}
-                    onClick={handleGetPhoneNumber}
+                    onClick={() => {
+                        handleGetPhoneNumber();
+                    }}
                 >
                     Liên kết số điện thoại
                 </Button>
