@@ -6,11 +6,26 @@ import LoadingHomePage from "./components/LoadingHomePage";
 import FollowOAPage from "./components/FollowOAPage";
 import WelcomePage from "./components/WelcomePage";
 
+const NUMBER_PHONE_KEY = "number-phone";
+
 const HomePage: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState<string>("");
     const [userInfomation, setUserInfomation] = useState<any>();
     const [loading, setLoading] = useState<boolean>(false);
     const { numberPhone, setNumberPhone, setUser } = useStore();
+
+
+    const savePhoneNumber = (phone: string) => {
+        setPhoneNumber(phone);
+        setNumberPhone(phone);
+        localStorage.setItem(NUMBER_PHONE_KEY, phone);
+    };
+
+    const removePhoneNumber = () => {
+        setPhoneNumber("");
+        setNumberPhone("");
+        localStorage.removeItem(NUMBER_PHONE_KEY);
+    };
 
     const fetchUserInfo = async () => {
         try {
@@ -44,9 +59,7 @@ const HomePage: React.FC = () => {
             });
             const result = await zaloResp.json();
             if (result?.data?.number) {
-                setPhoneNumber(result.data.number);
-                setNumberPhone(result.data.number || "");
-                localStorage.setItem("number-phone", result.data.number || "");
+                savePhoneNumber(result.data.number || "");
             }
         }
     };
@@ -55,22 +68,16 @@ const HomePage: React.FC = () => {
         try {
             const resp = await getPhoneNumber({});
             if (resp?.number) {
-                setPhoneNumber(resp.number);
-                setNumberPhone(resp.number);
-                localStorage.setItem("number-phone", resp.number);
+                savePhoneNumber(resp.number || "");
                 return;
             }
             if (resp?.token) {
                 getNumberPhoneByZalo(resp.token);
             } else {
-                localStorage.removeItem("number-phone");
-                setPhoneNumber("");
-                setNumberPhone("");
+                removePhoneNumber();
             }
         } catch (err) {
-            localStorage.removeItem("number-phone");
-            setPhoneNumber("");
-            setNumberPhone("");
+            removePhoneNumber();
         }
     };
 
