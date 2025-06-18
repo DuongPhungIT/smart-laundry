@@ -78,7 +78,7 @@ const GrantPermissionPage: React.FunctionComponent = () => {
     const handleFollowOA = async () => {
         try {
             await followOA({
-                id: "4070742748984905603", // ID của OA cần theo dõi
+                id: "1763339190618924040", // ID của OA cần theo dõi
             });
         } catch (error) {
             console.log(error);
@@ -121,7 +121,7 @@ const GrantPermissionPage: React.FunctionComponent = () => {
                 </Box>
             ) : (
                 <>
-                    {!(phoneNumber || numberPhone) ? (
+                    {phoneNumber || numberPhone ? (
                         <>
                             <Utinities utinities={APP_UTINITIES} />
                             <Box
