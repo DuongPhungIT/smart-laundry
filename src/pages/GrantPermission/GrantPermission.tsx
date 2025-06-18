@@ -43,6 +43,8 @@ const GrantPermissionPage: React.FunctionComponent = () => {
                 (await getAccessToken({})) || "ACCESS_TOKEN";
             const secretKey = "5NDKWi8Fo48B23hDAl1L";
 
+            console.log('resp===========', resp)
+
             if (resp?.token) {
                 // Gọi trực tiếp Zalo API để lấy số điện thoại
                 const zaloResp = await fetch(
