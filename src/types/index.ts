@@ -16,6 +16,8 @@ export type User = {
     name: string;
     avatar: string;
     idByOA?: string;
+    isSensitive?: boolean;
+    followedOA?: boolean;
 };
 
 export type OA = {

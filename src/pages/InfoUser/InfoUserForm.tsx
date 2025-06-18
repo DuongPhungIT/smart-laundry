@@ -3,12 +3,16 @@ import { Box, Text } from "zmp-ui";
 import "styled-components/macro";
 import { Button, Input } from "@components";
 import { useForm } from "react-hook-form";
-import { getPhoneNumber, getUserInfo, getAccessToken } from "zmp-sdk/apis";
+import { useStore } from "@store";
 
 const InfoUserForm: React.FC = () => {
-    const [phoneNumber, setPhoneNumber] = useState<string>("");
-    const [userInfomation, setUserInfomation] = useState<any>();
     const [editing, setEditing] = useState(false);
+    const [user, numberPhone, setUser, setNumberPhone] = useStore(state => [
+        state.user,
+        state.numberPhone,
+        state.setUser,
+        state.setNumberPhone,
+    ]) || [{}, "", () => undefined, () => undefined];
 
     const {
         register: registerEdit,
@@ -22,191 +26,180 @@ const InfoUserForm: React.FC = () => {
         },
     });
 
-    const handleGetPhoneNumber = async () => {
-        try {
-            const resp = await getPhoneNumber({});
-            const userAccessToken =
-                (await getAccessToken({})) || "ACCESS_TOKEN";
-            const secretKey = "5NDKWi8Fo48B23hDAl1L";
-
-            if (resp?.token) {
-                // Gọi trực tiếp Zalo API để lấy số điện thoại
-                const zaloResp = await fetch(
-                    "https://graph.zalo.me/v2.0/me/info",
-                    {
-                        method: "GET",
-                        headers: {
-                            access_token: userAccessToken,
-                            code: resp.token,
-                            secret_key: secretKey,
-                        },
-                    },
-                );
-
-                const result = await zaloResp.json();
-
-                if (result?.data?.number) {
-                    console.log("Phone Number Token result:", result);
-                    console.log("Phone Number Token data:", result?.data);
-                    setPhoneNumber(result.data.number);
-                } else {
-                    console.error(
-                        "Không lấy được số điện thoại từ Zalo API",
-                        result,
-                    );
-                }
-            }
-        } catch (error) {
-            console.error("Lỗi khi lấy số điện thoại:", error);
-        }
-    };
-
     useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                const user = await getUserInfo({
-                    avatarType: "normal",
-                    autoRequestPermission: true,
-                });
-                const { userInfo } = user;
-                await handleGetPhoneNumber();
-                setUserInfomation(userInfo);
-            } catch (error) {
-                console.error("Error fetching user info:", error);
-            }
-        };
-        fetchUserInfo();
-    }, []);
-
-    useEffect(() => {
-        if (userInfomation) {
+        if (user || numberPhone) {
             resetEdit({
-                name: userInfomation?.name || "",
-                phone: phoneNumber || "",
+                name: user?.name || "",
+                phone: numberPhone || "",
             });
         }
-    }, [userInfomation, phoneNumber, resetEdit]);
+    }, [user, numberPhone, resetEdit]);
 
     const onEditSubmit = (data: { name: string; phone: string }) => {
-        setUserInfomation((prev: any) => ({
-            ...prev,
-            name: data.name,
-        }));
-        setPhoneNumber(data.phone);
+        setUser({ ...user, name: data.name });
+        setNumberPhone(data.phone);
         setEditing(false);
     };
 
     return (
         <div
-            style={{ backgroundColor: "#f5f5f5", margin: 20, borderRadius: 8 }}
+            style={{
+                background: "#f4f7fa",
+                minHeight: "100vh",
+                padding: "24px 0",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "flex-start",
+            }}
         >
-            <Box p={4} tw="bg-white">
-                <Box>
-                    <Text style={{ fontWeight: 500 }}>
-                        Avatar:{" "}
-                        {userInfomation?.avatar ? (
+            <Box
+                style={{
+                    maxWidth: 400,
+                    width: "100%",
+                    background: "#fff",
+                    borderRadius: 18,
+                    boxShadow: "0 4px 24px #0002",
+                    padding: 28,
+                    margin: "0 auto",
+                }}
+            >
+                <Box style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <div
+                        style={{
+                            width: 80,
+                            height: 80,
+                            borderRadius: "50%",
+                            overflow: "hidden",
+                            marginBottom: 16,
+                            border: "2px solid #1976d2",
+                            background: "#f5f5f5",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        {user?.avatar ? (
                             <img
-                                src={userInfomation.avatar}
+                                src={user.avatar}
                                 alt="Avatar"
                                 style={{
-                                    width: 50,
-                                    height: 50,
-                                    borderRadius: "50%",
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
                                 }}
                             />
                         ) : (
-                            "Không có avatar"
+                            <Text style={{ color: "#bdbdbd" }}>No Avatar</Text>
                         )}
+                    </div>
+                    <Text.Title style={{ fontWeight: 700, fontSize: 22, marginBottom: 4 }}>
+                        {user?.name || "Chưa có tên"}
+                    </Text.Title>
+                    <Text style={{ color: "#888", marginBottom: 16 }}>
+                        ID: {user?.id || "Không có id"}
                     </Text>
                 </Box>
-                <Box mt={2}>
+                <Box mb={2}>
                     <Text style={{ fontWeight: 500 }}>
-                        Id: {userInfomation?.id || "Không có id"}
+                        <span style={{ color: "#1976d2" }}>Số điện thoại:</span>{" "}
+                        {numberPhone || "Không có số điện thoại"}
                     </Text>
                 </Box>
-                <Box mt={2}>
-                    <Text style={{ fontWeight: 500 }}>
-                        Họ và tên: {userInfomation?.name || "Không có tên"}
+                <Box mb={2}>
+                    <Text>
+                        <b>idByOA:</b> {user?.idByOA || "Không có idByOA"}
                     </Text>
                 </Box>
-                <Box mt={2}>
-                    <Text style={{ fontWeight: 500 }}>
-                        idByOA: {userInfomation?.idByOA || "Không có idByOA"}
+                <Box mb={2}>
+                    <Text>
+                        <b>isSensitive:</b>{" "}
+                        {user?.isSensitive !== undefined
+                            ? String(user.isSensitive)
+                            : "Không có"}
                     </Text>
                 </Box>
-                <Box mt={2}>
-                    <Text style={{ fontWeight: 500 }}>
-                        isSensitive:{" "}
-                        {userInfomation?.isSensitive !== undefined
-                            ? String(userInfomation.isSensitive)
-                            : "Không có isSensitive"}
+                <Box mb={2}>
+                    <Text>
+                        <b>followedOA:</b>{" "}
+                        {user?.followedOA !== undefined
+                            ? String(user.followedOA)
+                            : "Không có"}
                     </Text>
                 </Box>
-                <Box mt={2}>
-                    <Text style={{ fontWeight: 500 }}>
-                        followedOA:{" "}
-                        {userInfomation?.followedOA !== undefined
-                            ? String(userInfomation.followedOA)
-                            : "Không có followedOA"}
-                    </Text>
-                </Box>
-                <Box mt={2}>
-                    <Text style={{ fontWeight: 500 }}>
-                        Số điện thoại: {phoneNumber || "Không có số điện thoại"}
-                    </Text>
-                </Box>
-                <Box mt={2}>
-                    <Button size="small" onClick={() => setEditing(true)}>
+                <Box style={{ display: "flex", justifyContent: "center", marginTop: 20 }}>
+                    <Button
+                        size="large"
+                        style={{
+                            minWidth: 140,
+                            borderRadius: 8,
+                            fontWeight: 600,
+                            fontSize: 16,
+                        }}
+                        onClick={() => setEditing(true)}
+                    >
                         Sửa thông tin
                     </Button>
                 </Box>
-            </Box>
-
-            {editing && (
-                <Box p={4} tw="bg-white border-t border-gray-200">
-                    <form
-                        onSubmit={handleSubmitEdit(onEditSubmit)}
-                        style={{ marginTop: 12 }}
+                {editing && (
+                    <Box
+                        p={4}
+                        style={{
+                            background: "#f9f9f9",
+                            borderRadius: 12,
+                            marginTop: 24,
+                            boxShadow: "0 2px 8px #0001",
+                        }}
                     >
-                        <Box>
-                            <Input
-                                label="Họ và tên"
-                                placeholder="Nhập họ và tên"
-                                {...registerEdit("name", { required: true })}
-                                errorText={
-                                    errorsEdit.name ? "Không được để trống" : ""
-                                }
-                            />
-                        </Box>
-                        <Box mt={4}>
-                            <Input
-                                label="Số điện thoại"
-                                placeholder="Nhập số điện thoại"
-                                {...registerEdit("phone", { required: true })}
-                                errorText={
-                                    errorsEdit.phone
-                                        ? "Không được để trống"
-                                        : ""
-                                }
-                            />
-                        </Box>
-                        <Box mt={4} style={{ display: "flex", gap: 8 }}>
-                            <Button htmlType="submit" size="small">
-                                Lưu
-                            </Button>
-                            <Button
-                                size="small"
-                                onClick={e => {
-                                    e.preventDefault();
-                                    setEditing(false);
-                                }}
-                            >
-                                Hủy
-                            </Button>
-                        </Box>
-                    </form>
-                </Box>
-            )}
+                        <form onSubmit={handleSubmitEdit(onEditSubmit)}>
+                            <Box mb={3}>
+                                <Input
+                                    label="Họ và tên"
+                                    placeholder="Nhập họ và tên"
+                                    {...registerEdit("name", { required: true })}
+                                    errorText={
+                                        errorsEdit.name ? "Không được để trống" : ""
+                                    }
+                                />
+                            </Box>
+                            <Box mb={3}>
+                                <Input
+                                    label="Số điện thoại"
+                                    placeholder="Nhập số điện thoại"
+                                    {...registerEdit("phone", { required: true })}
+                                    errorText={
+                                        errorsEdit.phone
+                                            ? "Không được để trống"
+                                            : ""
+                                    }
+                                />
+                            </Box>
+                            <Box style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                                <Button
+                                    htmlType="submit"
+                                    size="small"
+                                    style={{ minWidth: 80 }}
+                                >
+                                    Lưu
+                                </Button>
+                                <Button
+                                    size="small"
+                                    style={{
+                                        background: "#eee",
+                                        color: "#333",
+                                        minWidth: 80,
+                                    }}
+                                    onClick={e => {
+                                        e.preventDefault();
+                                        setEditing(false);
+                                    }}
+                                >
+                                    Hủy
+                                </Button>
+                            </Box>
+                        </form>
+                    </Box>
+                )}
+            </Box>
         </div>
     );
 };

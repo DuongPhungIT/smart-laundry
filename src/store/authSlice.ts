@@ -14,6 +14,8 @@ export interface AuthSlice {
     setLoading: (loading: boolean) => void;
     getUserInfo: () => Promise<void>;
     getAccessToken: () => Promise<void>;
+    numberPhone?: string;
+    setNumberPhone: (numberPhone: string) => void;
 }
 
 const authSlice: StateCreator<AuthSlice, [], [], AuthSlice> = (set, get) => ({
@@ -31,6 +33,9 @@ const authSlice: StateCreator<AuthSlice, [], [], AuthSlice> = (set, get) => ({
     },
     setLoading: (loading: boolean) => {
         set(state => ({ ...state, loading }));
+    },
+    setNumberPhone: (numberPhone: string) => {
+        set(state => ({ ...state, numberPhone }));
     },
     getUserInfo: async () => {
         try {
