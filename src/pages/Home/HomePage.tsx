@@ -14,17 +14,12 @@ const HomePage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const { numberPhone, setNumberPhone, setUser } = useStore();
 
+    const isPhone = localStorage.getItem(NUMBER_PHONE_KEY);
 
     const savePhoneNumber = (phone: string) => {
         setPhoneNumber(phone);
         setNumberPhone(phone);
         localStorage.setItem(NUMBER_PHONE_KEY, phone);
-    };
-
-    const removePhoneNumber = () => {
-        setPhoneNumber("");
-        setNumberPhone("");
-        localStorage.removeItem(NUMBER_PHONE_KEY);
     };
 
     const fetchUserInfo = async () => {
@@ -64,26 +59,11 @@ const HomePage: React.FC = () => {
         }
     };
 
-    const checkPhonePermission = async () => {
-        try {
-            const resp = await getPhoneNumber({});
-            if (resp?.number) {
-                savePhoneNumber(resp.number || "");
-                return;
-            }
-            if (resp?.token) {
-                getNumberPhoneByZalo(resp.token);
-            } else {
-                removePhoneNumber();
-            }
-        } catch (err) {
-            removePhoneNumber();
-        }
-    };
-
     useEffect(() => {
         fetchUserInfo();
-        checkPhonePermission();
+        if (isPhone) {
+            savePhoneNumber(isPhone);
+        }
     }, []);
 
     const handleGetPhoneNumber = async () => {
