@@ -4,7 +4,9 @@ import "styled-components/macro";
 import ProductDefault from "@assets/product.png";
 import { ProductOrderItem } from "@types";
 import { request } from "@utils/KidoRequest";
+import NoProduct from "./components/NoProduct";
 import LoadingCreateOrderPage from "./components/LoadingCreateOrderPage";
+import Skeleton from "./components/Skeleton";
 
 const SHOP_ID_KEY = "shopId";
 
@@ -13,7 +15,7 @@ const CreateOrderForm: React.FC = () => {
     const [products, setProducts] = useState<ProductOrderItem[]>([]);
     const [totalAmount, setTotalAmount] = useState<number>(0);
 
-    const shopId = localStorage.getItem(SHOP_ID_KEY)
+    const shopId = localStorage.getItem(SHOP_ID_KEY);
 
     useEffect(() => {
         const getSuggestionOrders = async () => {
@@ -57,7 +59,6 @@ const CreateOrderForm: React.FC = () => {
                 paddingBottom: 110,
             }}
         >
-
             <Box
                 style={{
                     background: "#fff",
@@ -83,125 +84,84 @@ const CreateOrderForm: React.FC = () => {
                     >
                         Danh sách sản phẩm
                     </Text>
-                    {loading || products.length === 0
-                        ? Array.from({ length: 5 }).map((_, idx) => (
-                              <Box
-                                  key={Number(idx)}
-                                  style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      padding: "16px 24px",
-                                      borderBottom: "1px solid #f0f0f0",
-                                      background: "#fff",
-                                      opacity: 0.6,
-                                  }}
-                              >
-                                  <div
-                                      style={{
-                                          width: 56,
-                                          height: 56,
-                                          borderRadius: 8,
-                                          background: "#eee",
-                                          marginRight: 16,
-                                      }}
-                                  />
-                                  <div style={{ flex: 1 }}>
-                                      <div
-                                          style={{
-                                              width: "80%",
-                                              height: 16,
-                                              background: "#eee",
-                                              borderRadius: 4,
-                                              marginBottom: 8,
-                                          }}
-                                      />
-                                      <div
-                                          style={{
-                                              width: "40%",
-                                              height: 14,
-                                              background: "#f3eaea",
-                                              borderRadius: 4,
-                                          }}
-                                      />
-                                  </div>
-                                  <div
-                                      style={{
-                                          minWidth: 48,
-                                          height: 28,
-                                          background: "#f5f6fa",
-                                          borderRadius: 8,
-                                      }}
-                                  />
-                              </Box>
-                          ))
-                        : products.map((item, idx) => (
-                              <Box
-                                  key={item.sap}
-                                  style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      padding: "16px 24px",
-                                      borderBottom:
-                                          idx !== products.length - 1
-                                              ? "1px solid #f0f0f0"
-                                              : "none",
-                                      background: "#fff",
-                                  }}
-                              >
-                                  <img
-                                      src={item.image}
-                                      alt={item.sap}
-                                      style={{
-                                          width: 56,
-                                          height: 56,
-                                          borderRadius: 8,
-                                          objectFit: "cover",
-                                          marginRight: 16,
-                                          border: "1px solid #eee",
-                                      }}
-                                      onError={e => {
-                                          const target =
-                                              e.target as HTMLImageElement;
-                                          target.onerror = null;
-                                          target.src = ProductDefault;
-                                      }}
-                                  />
-                                  <div style={{ flex: 1 }}>
-                                      <Text
-                                          style={{
-                                              fontWeight: 700,
-                                              fontSize: 15,
-                                              marginBottom: 2,
-                                          }}
-                                      >
-                                          {item.name}
-                                      </Text>
-                                      <Text
-                                          style={{
-                                              color: "#e53935",
-                                              fontWeight: 600,
-                                              fontSize: 15,
-                                          }}
-                                      >
-                                          Gói {item.price?.toLocaleString()} Đ
-                                      </Text>
-                                  </div>
-                                  <div
-                                      style={{
-                                          minWidth: 48,
-                                          background: "#f5f6fa",
-                                          borderRadius: 8,
-                                          fontWeight: 700,
-                                          fontSize: 18,
-                                          color: "#333",
-                                          textAlign: "center",
-                                          padding: "6px 0",
-                                      }}
-                                  >
-                                      {item.quantity}
-                                  </div>
-                              </Box>
-                          ))}
+                    {(() => {
+                        if (loading) {
+                            return Array.from({ length: 6 }).map((_, idx) => (
+                                <Skeleton key={Number(idx)} />
+                            ));
+                        }
+                        if (products.length === 0) {
+                            return <NoProduct />;
+                        }
+                        return products.map((item, idx) => (
+                            <Box
+                                key={item.sap}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    padding: "16px 24px",
+                                    borderBottom:
+                                        idx !== products.length - 1
+                                            ? "1px solid #f0f0f0"
+                                            : "none",
+                                    background: "#fff",
+                                }}
+                            >
+                                <img
+                                    src={item.image}
+                                    alt={item.sap}
+                                    style={{
+                                        width: 56,
+                                        height: 56,
+                                        borderRadius: 8,
+                                        objectFit: "cover",
+                                        marginRight: 16,
+                                        border: "1px solid #eee",
+                                    }}
+                                    onError={e => {
+                                        const target =
+                                            e.target as HTMLImageElement;
+                                        target.onerror = null;
+                                        target.src = ProductDefault;
+                                    }}
+                                />
+                                <div style={{ flex: 1 }}>
+                                    <Text
+                                        style={{
+                                            fontWeight: 700,
+                                            fontSize: 15,
+                                            marginBottom: 2,
+                                        }}
+                                    >
+                                        {item.name}
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            color: "#e53935",
+                                            fontWeight: 600,
+                                            fontSize: 15,
+                                        }}
+                                    >
+                                        Gói {item.price?.toLocaleString()} Đ
+                                    </Text>
+                                </div>
+                                <div
+                                    style={{
+                                        minWidth: 48,
+                                        background: "#f5f6fa",
+                                        borderRadius: 8,
+                                        fontWeight: 700,
+                                        fontSize: 18,
+                                        color: "#333",
+                                        textAlign: "center",
+                                        padding: "6px 0",
+                                    }}
+                                >
+                                    {item.quantity}
+                                </div>
+                            </Box>
+                        ));
+                    })()}
                 </Box>
             </Box>
 
