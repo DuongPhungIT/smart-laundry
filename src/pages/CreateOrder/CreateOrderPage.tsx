@@ -30,7 +30,7 @@ const CreateOrderPage: FC<any> = () => {
     }
 
     return (
-        <PageLayout title="Đặt hàng">
+        <PageLayout title="Đơn hàng dự kiến">
             <CreateOrderForm />
         </PageLayout>
     );

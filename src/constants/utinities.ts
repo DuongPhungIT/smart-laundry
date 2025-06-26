@@ -13,13 +13,13 @@ export const APP_UTINITIES: Array<Utinity> = [
     {
         key: "create-order",
         label: "Đặt hàng",
-        icon: Icon.CalendarIcon,
+        icon: Icon.OrderIcon,
         path: "/create-order",
     },
     {
         key: "info",
-        label: "Thông tin",
-        icon: Icon.BookIcon,
+        label: "Lịch sử đơn hàng",
+        icon: Icon.HistoryOrderIcon,
         path: "/info",
     },
     // {

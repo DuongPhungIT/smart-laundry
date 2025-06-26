@@ -1,3 +1,4 @@
+export { default as BannerIcon } from "./Banner";
 export { default as BookIcon } from "./Book";
 export { default as HeadsetIcon } from "./Headset";
 export { default as PenIcon } from "./Pen";
@@ -9,6 +10,8 @@ export { default as ProfileIcon } from "./Profile";
 export { default as HeadphoneIcon } from "./Headphone";
 export { default as ClockIcon } from "./Clock";
 export { default as GlobeIcon } from "./Globe";
+export { default as OrderIcon } from "./Order";
+export { default as HistoryOrderIcon } from "./HistoryOrder";
 export { default as SearchIcon } from "./Search";
 export { default as ImageIcon } from "./ImageIcon";
 export { default as NotificationIcon } from "./Notification";

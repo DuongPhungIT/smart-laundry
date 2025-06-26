@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { getPhoneNumber, getUserInfo, getAccessToken } from "zmp-sdk/apis";
 import { useStore } from "@store";
+import { request } from "@utils/KidoRequest";
 import LoadingHomePage from "./components/LoadingHomePage";
 import FollowOAPage from "./components/FollowOAPage";
 import WelcomePage from "./components/WelcomePage";
 
 const NUMBER_PHONE_KEY = "number-phone";
+const SHOP_ID_KEY = "shopId";
 
 const HomePage: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -22,6 +24,10 @@ const HomePage: React.FC = () => {
         localStorage.setItem(NUMBER_PHONE_KEY, phone);
     };
 
+    const saveShopId = (id: string) => {
+        localStorage.setItem(SHOP_ID_KEY, id);
+    };
+
     const fetchUserInfo = async () => {
         try {
             setLoading(true);
@@ -30,12 +36,61 @@ const HomePage: React.FC = () => {
                 autoRequestPermission: true,
             });
             const { userInfo } = user;
+            console.log('user', user)
+
             setUser(userInfo);
             setUserInfomation(userInfo);
         } catch (error) {
             console.error("Error fetching user info:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const submitShopZaloInfo = async body => {
+        console.log("body", body);
+        try {
+            const params = {
+                business: "THOPHAT",
+            };
+            const resp = await request("telesales/submitShopZaloInfo", {
+                method: "POST",
+                params,
+                body: JSON.stringify(body),
+            });
+            if (resp?.code === 0) {
+                saveShopId(resp?.data?.shopId);
+            }
+        } catch (error) {
+            // Log error
+        }
+    };
+
+    const getShopByPhone = async number => {
+        try {
+            const params = {
+                business: "THOPHAT",
+                phone: number,
+            };
+            console.log("params", params);
+            const resp = await request("telesales/getShopByPhone", {
+                params,
+            });
+            if (resp?.code === 0) {
+                if (!resp?.data?.isExisted) {
+                    const body = {
+                        phone: number,
+                        uidZalo: userInfomation.id,
+                        uidByOAZalo: userInfomation.idByOA,
+                    };
+                    submitShopZaloInfo(body);
+                } else {
+                    saveShopId(resp?.data?.shopId);
+                }
+            }
+            console.log("resp", resp);
+        } catch (error) {
+            // Log error
         }
     };
 
@@ -53,8 +108,10 @@ const HomePage: React.FC = () => {
                 },
             });
             const result = await zaloResp.json();
-            if (result?.data?.number) {
-                savePhoneNumber(result.data.number || "");
+            const number = result?.data?.number;
+            if (number) {
+                getShopByPhone(number);
+                savePhoneNumber(number || "");
             }
         }
     };
